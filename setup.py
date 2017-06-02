@@ -13,7 +13,7 @@ setup(
     author_email="matthieu.boileau@math.unistra.fr",
     description="Export GitLab user information and create user accounts \
     using python-gitlab API",
-    license="PSF",
+    license="MIT",
     keywords="gitlab, API, CLI",
     url="https://gitlab.math.unistra.fr/gitlab-tools/gitlab-users",   # project home page, if any
 
