@@ -54,7 +54,9 @@ def query_yes_no(question, default="no"):
 
 def connect_to_gitlab():
     """Return a connection to GitLab API"""
-    return gitlab.Gitlab.from_config()
+    gl = gitlab.Gitlab.from_config()
+    url = gl._url.split('/api/v' + gl._api_version)[0]
+    return gl, url
 
 
 class GLUsers():
@@ -69,7 +71,7 @@ class GLUsers():
         self.unused = unused
         self.sign_in = sign_in
 
-        self.gl = connect_to_gitlab()
+        self.gl, self.url = connect_to_gitlab()
         self.all_gl_users = self.gl.users.list(all=True)
         self.alluser_ids = [gl_user.id for gl_user in self.all_gl_users]
 
@@ -206,7 +208,7 @@ class GLGroups(GLUsers):
 
             if not gl_groups:
                 print("No group matching {} found on {}.".format(self.groups,
-                      self.gl._url))
+                      self.url))
                 print(self.list_groups())
                 exit(1)
             for gl_group in gl_groups:
@@ -257,7 +259,7 @@ class NewUser():
     """A class to create a user"""
 
     def __init__(self, userdict):
-        self.gl = connect_to_gitlab()
+        self.gl, self.url = connect_to_gitlab()
         self.all_gl_users = self.gl.users.list(all=True)
         self.userdict = userdict
         if self.userdict['group']:
@@ -296,7 +298,7 @@ class NewUser():
         if self.group:
             if self.group['name'] not in gl['groupnames']:
                 print('Group "{}" does not exist.'.format(self.group['name']))
-                newgroup_url = self.gl._url + "/admin/groups/new"
+                newgroup_url = self.url + "/admin/groups/new"
                 print("Create it using GitLab using this link: {}"
                       .format(newgroup_url))
                 checkok = False
@@ -362,7 +364,7 @@ class OldUser():
 
     def __init__(self, username):
         self.username = username
-        self.gl = connect_to_gitlab()
+        self.gl, self.url = connect_to_gitlab()
         gl_user_list = self.gl.users.list(username=self.username)
         if gl_user_list:
             self.gl_user = gl_user_list[0]
