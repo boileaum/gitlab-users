@@ -12,7 +12,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name="gitlab-users",
-    version="0.3",
+    version="0.4",
     packages=find_packages(),
     entry_points={
         'console_scripts': ['gitlab-users = gitlab_users.gitlab_users:main'],
@@ -24,6 +24,7 @@ setup(
     author_email="matthieu.boileau@math.unistra.fr",
     description="Export GitLab user information and create user accounts \
     using python-gitlab API",
+    install_requires=['python-gitlab'],
     license="MIT",
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
