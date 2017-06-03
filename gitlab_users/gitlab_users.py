@@ -54,8 +54,16 @@ def query_yes_no(question, default="no"):
 
 def connect_to_gitlab():
     """Return a connection to GitLab API"""
-    gl = gitlab.Gitlab.from_config()
-    url = gl._url.split('/api/v')[0]
+    try:
+        gl = gitlab.Gitlab.from_config()
+        url = gl._url.split('/api/v')[0]
+    except gitlab.config.GitlabIDError as e:
+        print("""Exception in python-gitlab: {}.
+Check python-gitlab configuration on \
+http://python-gitlab.readthedocs.io/en/stable/cli.html"""
+              .format(e),
+              file=sys.stderr)
+        sys.exit(1)
     return gl, url
 
 
