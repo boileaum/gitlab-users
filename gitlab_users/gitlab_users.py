@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Short script to get gitlab users info using gitlab API
+Use GitLab API to:
+    1) get gitlab users info
+    2) automate user account creation/deletion
 """
 
 import argparse
@@ -200,7 +202,7 @@ class GLGroups(GLUsers):
         super().__init__(*args, **kwargs)
         self.all_gl_groups = self.gl.groups.list(all=True)
 
-    def list_groups(self):
+    def list_all_groups(self):
         groupnames = [gl_group.name for gl_group in self.all_gl_groups]
         msg = "Existing groups ({}):".format(len(groupnames))
         for groupname in sorted(groupnames):
@@ -211,7 +213,7 @@ class GLGroups(GLUsers):
         """Output users information"""
 
         if self.groups == 'list':
-            print(self.list_groups())
+            print(self.list_all_groups())
             exit(0)
         else:
             gl_groups = self.gl.groups.search(self.groups)
@@ -219,7 +221,7 @@ class GLGroups(GLUsers):
             if not gl_groups:
                 print("No group matching {} found on {}.".format(self.groups,
                       self.url))
-                print(self.list_groups())
+                print(self.list_all_groups())
                 exit(1)
             for gl_group in gl_groups:
                 user_ids = [gl_user.id for gl_user
@@ -230,8 +232,7 @@ class GLGroups(GLUsers):
 
 
 class GLSingleUser(GLUsers):
-    """A class to handle a single gitlab user
-    (also used by create_sshgw_users.py)"""
+    """A class to handle a single gitlab user"""
 
     def __init__(self, user, *args, **kwargs):
 
