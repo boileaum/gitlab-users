@@ -40,7 +40,7 @@ Usage
 
     gitlab-users -g a_group --email-only
 
--  Create a list of users from a csv file
+-  Create multiple user accounts at once from a csv file
 
 ::
 
