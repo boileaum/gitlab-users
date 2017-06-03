@@ -1,1 +1,1 @@
-python-gitlab
+python-gitlab>0.20

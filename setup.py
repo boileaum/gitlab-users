@@ -24,7 +24,7 @@ setup(
     author_email="matthieu.boileau@math.unistra.fr",
     description="Export GitLab user information and create user accounts \
     using python-gitlab API",
-    install_requires=['python-gitlab'],
+    install_requires=['python-gitlab>0.20'],
     license="MIT",
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
