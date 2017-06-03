@@ -11,7 +11,7 @@ Installation
 
 ::
 
-    python setup.py install
+    pip install gitlab-users
 
 -  Edit the ``~/.python-gitlab.cfg`` following the `python-gitlab
    package
