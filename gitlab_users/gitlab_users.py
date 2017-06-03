@@ -438,7 +438,7 @@ def main():
                         default=False, help="Display only e-mail address")
     parser.add_argument('--export-keys', dest='export_keys',
                         action='store_true', default=False,
-                        help="Export ssh keys")
+                        help="Export ssh keys (first in user's ssh-key list)")
     parser.add_argument('--unused', dest='unused',
                         action='store_true', default=False,
                         help="List unused accounts")
