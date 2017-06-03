@@ -214,7 +214,7 @@ class GLGroups(GLUsers):
 
         if self.groups == 'list':
             print(self.list_all_groups())
-            exit(0)
+            sys.exit(0)
         else:
             gl_groups = self.gl.groups.search(self.groups)
 
@@ -222,7 +222,7 @@ class GLGroups(GLUsers):
                 print("No group matching {} found on {}.".format(self.groups,
                       self.url))
                 print(self.list_all_groups())
-                exit(1)
+                sys.exit(1)
             for gl_group in gl_groups:
                 user_ids = [gl_user.id for gl_user
                             in gl_group.members.list(all=True)]
@@ -241,12 +241,12 @@ class GLSingleUser(GLUsers):
 
         if self.user != 'list':
             gl_userlist = self.gl.users.list(username=self.user)
-            if gl_userlist:  # Only if user list is not void
+            try:
                 self.gl_user = gl_userlist[0]
-            else:
+            except IndexError:
                 print("username {} not found in GitLab.".format(user))
                 print(self.list_usernames())
-                exit(1)
+                sys.exit(1)
 
     def get_ssh_key(self):
         """Return user most recent ssh key as a string"""
@@ -464,12 +464,7 @@ def main():
 
     if args.create:
         create_file = args.create[0]
-        create_file_ext = os.path.splitext(create_file)[1]
-        if os.path.splitext(create_file)[1] == '.csv':
-            newuserdicts = get_users_from_csv(create_file)
-        else:
-            sys.exit("Create file must be csv format, not {}"
-                     .format(create_file_ext))
+        newuserdicts = get_users_from_csv(create_file)
         for userdict in newuserdicts:
             newuser = NewUser(userdict)
             newuser.save()
