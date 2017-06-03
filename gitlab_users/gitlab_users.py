@@ -55,7 +55,7 @@ def query_yes_no(question, default="no"):
 def connect_to_gitlab():
     """Return a connection to GitLab API"""
     gl = gitlab.Gitlab.from_config()
-    url = gl._url.split('/api/v' + gl._api_version)[0]
+    url = gl._url.split('/api/v')[0]
     return gl, url
 
 
