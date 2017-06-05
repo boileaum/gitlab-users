@@ -424,16 +424,15 @@ def get_users_from_csv(filename):
 def main():
     """Get user input from command line and launch gitlab API"""
 
-    description = """
-    Export GitLab user information using python-gitlab API
-    (https://python-gitlab.readthedocs.io, see configuration page).
-    """
+    description = ("Export GitLab users information and "
+                   "automate user accounts creation")
+
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('-g', nargs='?', const='list', required=False,
-                        metavar="group", help="List groups [restrict to a \
+                        metavar="group", help="List all groups [restrict to a \
                         GitLab group]")
     parser.add_argument('-u', nargs='?', const='list', required=False,
-                        metavar="user", help="List users [restrict to a \
+                        metavar="user", help="List all users [restrict to a \
                         username]")
     parser.add_argument('--email-only', dest='email_only', action='store_true',
                         default=False, help="Display only e-mail address")
