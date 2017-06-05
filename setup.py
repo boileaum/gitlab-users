@@ -22,8 +22,8 @@ setup(
     # metadata for upload to PyPI
     author="Matthieu Boileau",
     author_email="matthieu.boileau@math.unistra.fr",
-    description="Export GitLab user information and create user accounts \
-    using python-gitlab API",
+    description=("Export GitLab users information and automate user "
+                 "accounts creation"),
     install_requires=['python-gitlab>0.20'],
     license="MIT",
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -45,7 +45,7 @@ setup(
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 3',
     ],
-    keywords="gitlab, API, CLI",
+    keywords="gitlab API CLI",
     url="https://gitlab.math.unistra.fr/gitlab-tools/gitlab-users",   # project home page, if any
 
     # could also include long_description, download_url, classifiers, etc.
