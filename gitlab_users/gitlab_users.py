@@ -56,33 +56,35 @@ def query_yes_no(question, default="no"):
                              "(or 'y' or 'n').\n")
 
 
-def connect_to_gitlab():
+def connect_to_gitlab(gitlab_id=None):
     """Return a connection to GitLab API"""
     try:
-        gl = gitlab.Gitlab.from_config()
+        gl = gitlab.Gitlab.from_config(gitlab_id)
         url = gl._url.split('/api/v')[0]
-    except gitlab.config.GitlabIDError as e:
+    except (gitlab.config.GitlabIDError, gitlab.config.GitlabDataError) as e:
         print("Exception in python-gitlab: {}.\n".format(e),
               "Check python-gitlab configuration on",
               "http://python-gitlab.readthedocs.io/en/stable/cli.html",
               file=sys.stderr)
         sys.exit(1)
+
     return gl, url
 
 
 class GLUsers():
     """A mother class to handle gitlab users"""
 
-    def __init__(self, email_only=False, export_keys=False, username=False,
-                 activity=[], sign_in_date=False):
+    def __init__(self, gitlab_id=None, email_only=False, export_keys=False,
+                 username=False, activity=[], sign_in_date=False):
 
+        self.gitlab_id = gitlab_id
         self.email_only = email_only
         self.export_keys = export_keys
         self.username = username
         self.activity = activity
         self.sign_in_date = sign_in_date
 
-        self.gl, self.url = connect_to_gitlab()
+        self.gl, self.url = connect_to_gitlab(self.gitlab_id)
         self.all_gl_users = self.gl.users.list(all=True)
         self.alluser_ids = [gl_user.id for gl_user in self.all_gl_users]
 
@@ -433,17 +435,25 @@ def main():
 
     parser = argparse.ArgumentParser(description=description)
 
+    parser.add_argument('--gitlab', required=False,
+                        help=("Which configuration section should be used in "
+                              "~/.python-gitlab.cfg file. If not defined, the "
+                              "default selection will be used."))
+
     arg_filter = parser.add_mutually_exclusive_group()
     arg_filter.add_argument('-g', nargs='?', const='list', required=False,
-                            metavar="group", help="List all groups [restrict \
-                            to a GitLab group]")
+                            metavar="group",
+                            help="List all groups [restrict to a GitLab \
+                                  group]")
+
     arg_filter.add_argument('-u', nargs='?', const='list', required=False,
-                            metavar="user", help="List all users [restrict \
-                            to a username]")
+                            metavar="user",
+                            help="List all users [restrict to a username]")
 
     parser.add_argument('--email-only', dest='email_only',
                         action='store_true',
-                        default=False, help="Display only e-mail address")
+                        default=False,
+                        help="Display only e-mail address")
 
     arg_show = parser.add_argument_group('Additional info')
 
@@ -451,7 +461,8 @@ def main():
                           action='store_true', default=False,
                           help="Display last sign-in date")
     arg_show.add_argument('--username', dest='username', action='store_true',
-                          default=False, help="Display username as @username")
+                          default=False,
+                          help="Display username as @username")
 
     parser.add_argument('--export-keys', dest='export_keys',
                         action='store_true', default=False,
@@ -508,13 +519,15 @@ def main():
         activity = [key for key in activityd.keys() if activityd[key]]
 
         if args.g:
-            glu = GLGroups(args.g, args.email_only, args.export_keys,
-                           args.username, activity, args.sign_in_date)
+            glu = GLGroups(args.gitlab, args.g, args.email_only,
+                           args.export_keys, args.username, activity,
+                           args.sign_in_date)
         elif args.u:
-            glu = GLSingleUser(args.u, args.email_only, args.export_keys,
-                               args.username, activity, args.sign_in_date)
+            glu = GLSingleUser(args.gitlab, args.u, args.email_only,
+                               args.export_keys, args.username, activity,
+                               args.sign_in_date)
         else:
-            glu = GLUsers(args.email_only, args.export_keys,
+            glu = GLUsers(args.gitlab, args.email_only, args.export_keys,
                           args.username, activity, args.sign_in_date)
 
         glu.output()
