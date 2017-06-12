@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Use GitLab API to:
-    1) get gitlab users info
+    1) list gitlab users info
     2) automate user account creation/deletion
 """
 
@@ -62,10 +62,9 @@ def connect_to_gitlab():
         gl = gitlab.Gitlab.from_config()
         url = gl._url.split('/api/v')[0]
     except gitlab.config.GitlabIDError as e:
-        print("""Exception in python-gitlab: {}.
-Check python-gitlab configuration on \
-http://python-gitlab.readthedocs.io/en/stable/cli.html"""
-              .format(e),
+        print("Exception in python-gitlab: {}.\n".format(e),
+              "Check python-gitlab configuration on",
+              "http://python-gitlab.readthedocs.io/en/stable/cli.html",
               file=sys.stderr)
         sys.exit(1)
     return gl, url
@@ -75,13 +74,13 @@ class GLUsers():
     """A mother class to handle gitlab users"""
 
     def __init__(self, email_only=False, export_keys=False, username=False,
-                 unused=False, sign_in=False):
+                 activity=[], sign_in_date=False):
 
         self.email_only = email_only
         self.export_keys = export_keys
         self.username = username
-        self.unused = unused
-        self.sign_in = sign_in
+        self.activity = activity
+        self.sign_in_date = sign_in_date
 
         self.gl, self.url = connect_to_gitlab()
         self.all_gl_users = self.gl.users.list(all=True)
@@ -91,29 +90,29 @@ class GLUsers():
         self.userdict = {key: value for (key, value)
                          in zip(self.alluser_ids, self.all_gl_users)}
 
-    def sign_in_date(self, gl_user):
+    def _sign_in_date(self, gl_user):
         """Return user sign-in date"""
         if gl_user.current_sign_in_at:
             return gl_user.current_sign_in_at.split('T')[0]
         else:
             return None
 
-    def sign_in_date_and_time(self, gl_user):
+    def _sign_in_date_and_time(self, gl_user):
         """Return user sign-in date and time"""
-        return datetime.strptime(self.sign_in_date(gl_user), "%Y-%m-%d")
+        return datetime.strptime(self._sign_in_date(gl_user), "%Y-%m-%d")
 
     def user_info(self, gl_user):
         """Return info for given user"""
-        if self.username:
-            return "@{} {} <{}>".format(gl_user.username,
-                                        gl_user.name,
-                                        gl_user.email)
-        elif self.sign_in:
-            return "{} <{}> ({})".format(gl_user.name,
-                                         gl_user.email,
-                                         self.sign_in_date(gl_user))
+        if self.email_only:
+            info = gl_user.email
         else:
-            return "{} <{}>".format(gl_user.name, gl_user.email)
+            info = "{} <{}>".format(gl_user.name, gl_user.email)
+            # Complete with additional info
+            if self.username:
+                info = "@{} ".format(gl_user.username) + info
+            if self.sign_in_date:
+                info = info + " ({})".format(self._sign_in_date(gl_user))
+        return info
 
     def list_usernames(self):
         usernames = [gl_user.username for gl_user in self.all_gl_users]
@@ -129,27 +128,24 @@ class GLUsers():
 
         for user_id in user_ids:
             gl_user = self.userdict[user_id]
-            if self.email_only:
-                print(gl_user.email)
-            else:
-                if self.export_keys:
-                    key_dir = 'ssh_keys'
-                    if not os.path.exists(key_dir):
-                        os.mkdir(key_dir)
-                    keys = gl_user.keys.list()
-                    if keys:  # User has a ssh-key
-                        sys.stdout.buffer.write(self.user_info(gl_user))
-                        key = keys[0].key
-                        key_filename = "{}/{}.pub".format(key_dir,
-                                                          gl_user.username)
-                        with open(key_filename, 'w') as f:
-                            f.write(key)
-
-                    else:
-                        nokey_gl_users.append(gl_user)
+            if self.export_keys:
+                key_dir = 'ssh_keys'
+                if not os.path.exists(key_dir):
+                    os.mkdir(key_dir)
+                keys = gl_user.keys.list()
+                if keys:  # User has a ssh-key
+                    sys.stdout.buffer.write(self.user_info(gl_user))
+                    key = keys[0].key
+                    key_filename = "{}/{}.pub".format(key_dir,
+                                                      gl_user.username)
+                    with open(key_filename, 'w') as f:
+                        f.write(key)
 
                 else:
-                    print(self.user_info(gl_user))
+                    nokey_gl_users.append(gl_user)
+
+            else:
+                print(self.user_info(gl_user))
 
         if self.export_keys:
             print("--")
@@ -166,29 +162,37 @@ class GLUsers():
     def output(self):
         """Output users information"""
 
-        if self.unused:
+        if self.activity:
 
             old_sign_in = []
             never_sign_in = []
+            already_sign_in = []
             for gl_user in self.all_gl_users:
                 # Find the last connexion date
                 # Split using the T between date and hours
                 # Do not care about minutes...
                 if gl_user.current_sign_in_at:
-                    current_sign_in = self.sign_in_date_and_time(gl_user)
-                    if current_sign_in < datetime.now()-timedelta(days=365) \
-                       and gl_user.state == 'active':
-                        old_sign_in.append(gl_user)
+                    current_sign_in = self._sign_in_date_and_time(gl_user)
+                    if gl_user.state == 'active':
+                        already_sign_in.append(gl_user)
+                        if current_sign_in < datetime.now() - \
+                           timedelta(days=365):
+                            old_sign_in.append(gl_user)
                 elif gl_user.state == 'active':
                     never_sign_in.append(gl_user)
 
-            print("  Users whose last connexion is older than 1 year:")
-            for gl_user in old_sign_in:
-                print(self.user_info(gl_user))
+            if 'unused' in self.activity:
+                print("  Users whose last connexion is older than 1 year:")
+                for gl_user in old_sign_in:
+                    print(self.user_info(gl_user))
+                print("  Users who never signed in:")
+                for gl_user in never_sign_in:
+                    print(self.user_info(gl_user))
 
-            print("  Users who never signed in:")
-            for gl_user in never_sign_in:
-                print(self.user_info(gl_user))
+            elif 'sign_in' in self.activity:
+                print("  Users who have alread signed in:")
+                for gl_user in already_sign_in:
+                    print(self.user_info(gl_user))
         else:
             self.print_users(self.alluser_ids)
 
@@ -424,29 +428,44 @@ def get_users_from_csv(filename):
 def main():
     """Get user input from command line and launch gitlab API"""
 
-    description = ("Export GitLab users information and "
+    description = ("List GitLab users information and "
                    "automate user accounts creation")
 
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('-g', nargs='?', const='list', required=False,
-                        metavar="group", help="List all groups [restrict to a \
-                        GitLab group]")
-    parser.add_argument('-u', nargs='?', const='list', required=False,
-                        metavar="user", help="List all users [restrict to a \
-                        username]")
-    parser.add_argument('--email-only', dest='email_only', action='store_true',
+
+    arg_filter = parser.add_mutually_exclusive_group()
+    arg_filter.add_argument('-g', nargs='?', const='list', required=False,
+                            metavar="group", help="List all groups [restrict \
+                            to a GitLab group]")
+    arg_filter.add_argument('-u', nargs='?', const='list', required=False,
+                            metavar="user", help="List all users [restrict \
+                            to a username]")
+
+    parser.add_argument('--email-only', dest='email_only',
+                        action='store_true',
                         default=False, help="Display only e-mail address")
+
+    arg_show = parser.add_argument_group('Additional info')
+
+    arg_show.add_argument('--sign-in-date', dest='sign_in_date',
+                          action='store_true', default=False,
+                          help="Display last sign-in date")
+    arg_show.add_argument('--username', dest='username', action='store_true',
+                          default=False, help="Display username as @username")
+
     parser.add_argument('--export-keys', dest='export_keys',
                         action='store_true', default=False,
                         help="Export ssh keys (first in user's ssh-key list)")
-    parser.add_argument('--unused', dest='unused',
-                        action='store_true', default=False,
-                        help="List unused accounts")
-    parser.add_argument('--sign-in', dest='sign_in',
-                        action='store_true', default=False,
-                        help="Show last sign-in date")
-    parser.add_argument('--username', dest='username', action='store_true',
-                        default=False, help="Display username as @username")
+
+    arg_activity = parser.add_mutually_exclusive_group()
+    arg_activity.add_argument('--unused', dest='unused',
+                              action='store_true', default=False,
+                              help="List unused accounts")
+    arg_activity.add_argument('--sign-in', dest='sign_in',
+                              action='store_true', default=False,
+                              help="Display only users that have already \
+                              signed in")
+
     arg_group = parser.add_mutually_exclusive_group()
     arg_group.add_argument('--create-from', nargs=1, required=False,
                            dest='create', metavar="csv_file",
@@ -459,6 +478,7 @@ def main():
     arg_group.add_argument('--delete', nargs=1, required=False,
                            dest='delete', metavar="username",
                            help="Delete user")
+
     args = parser.parse_args()
 
     if args.create:
@@ -482,15 +502,20 @@ def main():
 
     else:
         # Print info to standard output
+
+        activityd = {'unused': args.unused,
+                     'sign_in': args.sign_in}
+        activity = [key for key in activityd.keys() if activityd[key]]
+
         if args.g:
             glu = GLGroups(args.g, args.email_only, args.export_keys,
-                           args.username, args.unused, args.sign_in)
+                           args.username, activity, args.sign_in_date)
         elif args.u:
             glu = GLSingleUser(args.u, args.email_only, args.export_keys,
-                               args.username, args.unused, args.sign_in)
+                               args.username, activity, args.sign_in_date)
         else:
             glu = GLUsers(args.email_only, args.export_keys,
-                          args.username, args.unused, args.sign_in)
+                          args.username, activity, args.sign_in_date)
 
         glu.output()
 
