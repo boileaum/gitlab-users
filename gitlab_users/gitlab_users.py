@@ -190,7 +190,7 @@ class GLUsers():
                     print(self.user_info(gl_user))
 
             elif 'sign_in' in self.activity:
-                print("  Users who have alread signed in:")
+                print("  Users who have already signed in:")
                 for gl_user in already_sign_in:
                     print(self.user_info(gl_user))
         else:
