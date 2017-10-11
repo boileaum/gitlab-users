@@ -12,7 +12,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name="gitlab-users",
-    version="0.3",
+    version="0.4",
     packages=find_packages(),
     entry_points={
         'console_scripts': ['gitlab-users = gitlab_users.gitlab_users:main'],
@@ -43,10 +43,11 @@ setup(
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
+        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
     ],
     keywords="gitlab API CLI",
-    url="https://gitlab.math.unistra.fr/gitlab-tools/gitlab-users",   # project home page, if any
+    url="https://github.com/boileaum/gitlab-users",   # project home page, if any
 
     # could also include long_description, download_url, classifiers, etc.
     long_description=long_description
