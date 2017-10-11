@@ -1,3 +1,8 @@
+## Version 0.4 - 2017-10-11
+
+- Compatibility with python2
+- Fix bugs with -u and -g options
+
 ## Version 0.3 - 2017-06-12
 
 - Handle non default GitLab instance target (#3)
