@@ -523,11 +523,11 @@ def main():
         activity = [key for key in activityd.keys() if activityd[key]]
 
         if args.g:
-            glu = GLGroups(args.gitlab, args.g, args.email_only,
+            glu = GLGroups(args.g, args.gitlab, args.email_only,
                            args.export_keys, args.username, activity,
                            args.sign_in_date)
         elif args.u:
-            glu = GLSingleUser(args.gitlab, args.u, args.email_only,
+            glu = GLSingleUser(args.u, args.gitlab, args.email_only,
                                args.export_keys, args.username, activity,
                                args.sign_in_date)
         else:
