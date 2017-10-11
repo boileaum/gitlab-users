@@ -1,7 +1,7 @@
 gitlab-users
 ============
 
-A simple command line interface to handle GitLab user accounts, based on
+A simple command line interface to manage GitLab user accounts, based on
 `python-gitlab <https://github.com/python-gitlab/python-gitlab>`__.
 
 Installation
