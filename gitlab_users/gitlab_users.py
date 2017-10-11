@@ -1,10 +1,14 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Use GitLab API to:
     1) list gitlab users info
     2) automate user account creation/deletion
 """
+
+from __future__ import print_function
+from builtins import super
+from builtins import str
 
 import argparse
 import csv
@@ -71,7 +75,7 @@ def connect_to_gitlab(gitlab_id=None):
     return gl, url
 
 
-class GLUsers():
+class GLUsers(object):
     """A mother class to handle gitlab users"""
 
     def __init__(self, gitlab_id=None, email_only=False, export_keys=False,
@@ -108,7 +112,7 @@ class GLUsers():
         if self.email_only:
             info = gl_user.email
         else:
-            info = "{} <{}>".format(gl_user.name, gl_user.email)
+            info = u"{} <{}>".format(str(gl_user.name), gl_user.email)
             # Complete with additional info
             if self.username:
                 info = "@{} ".format(gl_user.username) + info
@@ -222,7 +226,7 @@ class GLGroups(GLUsers):
             print(self.list_all_groups())
             sys.exit(0)
         else:
-            gl_groups = self.gl.groups.search(self.groups)
+            gl_groups = self.gl.groups.list(search=self.groups)
 
             if not gl_groups:
                 print("No group matching {} found on {}.".format(self.groups,
@@ -338,7 +342,7 @@ class NewUser():
     def _add_to_group(self):
         print("Adding to group...")
         if self.group:
-            groups = self.gl.groups.search(self.group['name'])
+            groups = self.gl.groups.list(search=self.group['name'])
             if len(groups) == 1 and self.group['name'] == groups[0].name:
                 access_level = ACCESS_LEVEL[self.group['access_level']]
                 group_id = groups[0].id
@@ -519,11 +523,11 @@ def main():
         activity = [key for key in activityd.keys() if activityd[key]]
 
         if args.g:
-            glu = GLGroups(args.gitlab, args.g, args.email_only,
+            glu = GLGroups(args.g, args.gitlab, args.email_only,
                            args.export_keys, args.username, activity,
                            args.sign_in_date)
         elif args.u:
-            glu = GLSingleUser(args.gitlab, args.u, args.email_only,
+            glu = GLSingleUser(args.u, args.gitlab, args.email_only,
                                args.export_keys, args.username, activity,
                                args.sign_in_date)
         else:
