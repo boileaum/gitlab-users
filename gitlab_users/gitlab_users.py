@@ -48,15 +48,14 @@ def query_yes_no(question, default="no"):
         raise ValueError("invalid default answer: '%s'" % default)
 
     while True:
-        sys.stdout.write(question + prompt)
+        print(question + prompt)
         choice = input().lower()
         if default and choice == '':
             return valid[default]
         elif choice in valid:
             return valid[choice]
         else:
-            sys.stdout.write("Please respond with 'yes' or 'no' "
-                             "(or 'y' or 'n').\n")
+            print("Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
 
 
 def connect_to_gitlab(gitlab_id=None):
@@ -139,7 +138,7 @@ class GLUsers(object):
                     os.mkdir(key_dir)
                 keys = gl_user.keys.list()
                 if keys:  # User has a ssh-key
-                    sys.stdout.buffer.write(self.user_info(gl_user))
+                    print(self.user_info(gl_user))
                     key = keys[0].key
                     key_filename = "{}/{}.pub".format(key_dir,
                                                       gl_user.username)

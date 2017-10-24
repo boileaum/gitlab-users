@@ -1,3 +1,7 @@
+## Version 0.5 - 2017-10-24
+
+- Fix bugs with printing to stdout
+
 ## Version 0.4 - 2017-10-11
 
 - Compatibility with python2
