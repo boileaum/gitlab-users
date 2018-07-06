@@ -1,3 +1,7 @@
+## Version 0.6 - 2018-07-06
+
+- Handle gitlab subgroups
+
 ## Version 0.5 - 2017-10-24
 
 - Fix bugs with printing to stdout
