@@ -21,6 +21,7 @@ ACCESS_LEVEL = {'guest': gitlab.GUEST_ACCESS,
                 'reporter': gitlab.REPORTER_ACCESS,
                 'developer': gitlab.DEVELOPER_ACCESS,
                 'master': gitlab.MASTER_ACCESS,
+                'maintainer': gitlab.MASTER_ACCESS,
                 'owner': gitlab.OWNER_ACCESS}
 
 
