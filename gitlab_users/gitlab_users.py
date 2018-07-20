@@ -63,7 +63,6 @@ def connect_to_gitlab(gitlab_id=None):
     """Return a connection to GitLab API"""
     try:
         gl = gitlab.Gitlab.from_config(gitlab_id)
-        url = gl._url.split('/api/v')[0]
     except (gitlab.config.GitlabIDError, gitlab.config.GitlabDataError) as e:
         print("Exception in python-gitlab: {}.\n".format(e),
               "Check python-gitlab configuration on",
@@ -71,7 +70,7 @@ def connect_to_gitlab(gitlab_id=None):
               file=sys.stderr)
         sys.exit(1)
 
-    return gl, url
+    return gl
 
 
 class GLUsers(object):
@@ -87,7 +86,8 @@ class GLUsers(object):
         self.activity = activity
         self.sign_in_date = sign_in_date
 
-        self.gl, self.url = connect_to_gitlab(self.gitlab_id)
+        self.gl = connect_to_gitlab(self.gitlab_id)
+        self.url = self.gl.url
         self.all_gl_users = self.gl.users.list(all=True)
         self.alluser_ids = [gl_user.id for gl_user in self.all_gl_users]
 
@@ -279,7 +279,8 @@ class NewUser():
     """A class to create a user"""
 
     def __init__(self, userdict):
-        self.gl, self.url = connect_to_gitlab()
+        self.gl = connect_to_gitlab()
+        self.url = self.gl.url
         self.all_gl_users = self.gl.users.list(all=True)
         self.userdict = userdict
         if self.userdict['group']:
@@ -316,13 +317,18 @@ class NewUser():
                 checkok = False
 
         if self.group:
-            if self.group['name'] not in gl['groupnames']:
-                print('Group "{}" does not exist.'.format(self.group['name']))
-                newgroup_url = self.url + "/admin/groups/new"
-                print("Create it using GitLab using this link: {}"
-                      .format(newgroup_url))
-                checkok = False
-
+            try:
+                self.gl.groups.get(self.group['name'])
+            except gitlab.GitlabGetError as e:
+                if e.response_body == 'Group Not Found':
+                    print('Group "{}" does not exist.'.format(self.group['name']))
+                    newgroup_url = self.url + "/admin/groups/new"
+                    print("Create it using GitLab using this link: {}"
+                          .format(newgroup_url))
+                    checkok = False
+                else:
+                    raise
+              
         if checkok:
             print("... OK")
 
@@ -339,19 +345,27 @@ class NewUser():
         print("    User {} created".format(self.userdict['username']))
 
     def _add_to_group(self):
+        
+        def get_subgroup(group, subgroup):
+            """Return a subgroup object"""
+            subgroup = group.get(372)
+            subgroup = ""
+            return subgroup
+        
         print("Adding to group...")
         if self.group:
-            groups = self.gl.groups.list(search=self.group['name'])
-            if len(groups) == 1 and self.group['name'] == groups[0].name:
-                access_level = ACCESS_LEVEL[self.group['access_level']]
-                group_id = groups[0].id
-                self.gl.group_members.create({'user_id': self.gluser.id,
-                                              'access_level': access_level},
-                                             group_id=group_id)
-                print("    User {} added to group {}".format(
-                        self.userdict['username'], self.group['name']))
-            else:
-                sys.exit("Group {} not found".format(self.group['name']))
+            try:
+                group = self.gl.groups.get(self.group['name'])
+            except gitlab.GitlabGetError as e:
+                if e.response_body == 'Group Not Found':
+                    sys.exit("Group {} not found".format(self.group['name']))
+                else:
+                    raise
+            access_level = ACCESS_LEVEL[self.group['access_level']]
+            group.members.create({'user_id': self.gluser.id,
+                                  'access_level': access_level})
+            print("    User {} added to group {}".format(
+                   self.userdict['username'], self.group['name']))
         else:
             sys.exit("No group for this new user")
 
@@ -384,7 +398,8 @@ class OldUser():
 
     def __init__(self, username):
         self.username = username
-        self.gl, self.url = connect_to_gitlab()
+        self.gl = connect_to_gitlab()
+        self.url = self.gl.url
         gl_user_list = self.gl.users.list(username=self.username)
         if gl_user_list:
             self.gl_user = gl_user_list[0]
