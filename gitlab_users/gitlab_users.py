@@ -87,7 +87,7 @@ class GLUsers(object):
         self.sign_in_date = sign_in_date
 
         self.gl = connect_to_gitlab(self.gitlab_id)
-        self.url = self.gl.url
+        self.url = self.gl._url
         self.all_gl_users = self.gl.users.list(all=True)
         self.alluser_ids = [gl_user.id for gl_user in self.all_gl_users]
 
@@ -280,7 +280,7 @@ class NewUser():
 
     def __init__(self, userdict):
         self.gl = connect_to_gitlab()
-        self.url = self.gl.url
+        self.url = self.gl._url
         self.all_gl_users = self.gl.users.list(all=True)
         self.userdict = userdict
         if self.userdict['group']:
@@ -399,7 +399,7 @@ class OldUser():
     def __init__(self, username):
         self.username = username
         self.gl = connect_to_gitlab()
-        self.url = self.gl.url
+        self.url = self.gl._url
         gl_user_list = self.gl.users.list(username=self.username)
         if gl_user_list:
             self.gl_user = gl_user_list[0]
