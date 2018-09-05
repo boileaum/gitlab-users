@@ -1,3 +1,7 @@
+## Version 0.7 - 2018-09-05
+
+- Handle gitlab subgroups
+
 ## Version 0.6 - 2018-07-06
 
 - Handle gitlab subgroups
