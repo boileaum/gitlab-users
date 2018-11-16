@@ -440,7 +440,7 @@ def get_users_from_csv(filename):
         # Filter csv file header
         csvreader = csv.reader(row for row in csvfile
                                if not row.startswith('#'))
-        newusers = [dict(zip(fieldnames, row)) for row in csvreader]
+        newusers = [dict(map(None, fieldnames, row)) for row in csvreader]
 
         return newusers
 
