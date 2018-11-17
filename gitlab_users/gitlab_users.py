@@ -8,6 +8,10 @@ Use GitLab API to:
 
 from __future__ import print_function
 from builtins import super, str, input
+try:
+    from itertools import zip_longest  # python3
+except ImportError:
+    from itertools import izip_longest as zip_longest  # python2
 
 import argparse
 import csv
@@ -441,7 +445,8 @@ def get_users_from_csv(filename):
         csvreader = csv.reader(row for row in csvfile
                                if not row.startswith('#'))
         stripped_reader = [[x.strip() for x in row] for row in csvreader]
-        newusers = [dict(zip(fieldnames, row)) for row in stripped_reader]
+        newusers = [dict(zip_longest(fieldnames, row))
+                    for row in stripped_reader]
 
         return newusers
 
