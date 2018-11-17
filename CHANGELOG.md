@@ -1,3 +1,8 @@
+## Version 0.8 - 2018-11-17
+
+- Fix --delete-from error with python2
+- Enable to remove unnecessary commas in newusers.csv file (thanks to @yangliping)
+
 ## Version 0.7 - 2018-09-05
 
 - Handle gitlab subgroups

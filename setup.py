@@ -12,7 +12,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name="gitlab-users",
-    version="0.7",
+    version="0.8",
     packages=find_packages(),
     entry_points={
         'console_scripts': ['gitlab-users = gitlab_users.gitlab_users:main'],
