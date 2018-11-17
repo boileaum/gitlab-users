@@ -52,7 +52,7 @@ where ``example.csv`` contains
 
     # username, name, email, [organization], [location], [group], [access_level]
     wayne,Bruce Wayne,bruce.wayne@wayne-entreprises.com,Wayne Entreprises,Gotham City,Board,owner
-    kent,Clark Kent,clark.kent@krypton.univ,,Smallville,,
+    kent,Clark Kent,clark.kent@krypton.univ,,Smallville
 
 -  List unused accounts (never sign-in or last connection is older than
    1 year)
