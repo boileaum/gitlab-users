@@ -7,7 +7,7 @@ Use GitLab API to:
 """
 
 from __future__ import print_function
-from builtins import super, str
+from builtins import super, str, input
 
 import argparse
 import csv
