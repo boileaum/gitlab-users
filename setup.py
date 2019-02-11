@@ -50,5 +50,8 @@ setup(
     url="https://github.com/boileaum/gitlab-users",   # project home page, if any
 
     # could also include long_description, download_url, classifiers, etc.
-    long_description=long_description
+    long_description=long_description,
+
+    # package can be installed from a zip file
+    zip_safe=True
 )
