@@ -1,3 +1,7 @@
+## Version 0.8.2 - 2019-03-28
+
+- Use requirements.txt for project packaging
+
 ## Version 0.8.1 - 2019-03-28
 
 - Fix missing requirement
