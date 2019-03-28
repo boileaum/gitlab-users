@@ -1,1 +1,2 @@
+future
 python-gitlab>0.20

@@ -1,3 +1,7 @@
+## Version 0.8.1 - 2019-03-28
+
+- Fix missing requirement
+
 ## Version 0.8 - 2018-11-17
 
 - Fix --delete-from error with python2
