@@ -10,6 +10,10 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
+# Read requirements from file
+with open('requirements.txt') as f:
+        requirements = f.read().splitlines()
+
 setup(
     name="gitlab-users",
     version="0.8.1",
@@ -24,7 +28,7 @@ setup(
     author_email="matthieu.boileau@math.unistra.fr",
     description=("Export GitLab users information and automate user "
                  "accounts creation"),
-    install_requires=['python-gitlab>0.20'],
+    install_requires=requirements,
     license="MIT",
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
