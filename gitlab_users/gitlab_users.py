@@ -81,10 +81,11 @@ class GLUsers(object):
     """A mother class to handle gitlab users"""
 
     def __init__(self, gitlab_id=None, email_only=False, export_keys=False,
-                 username=False, activity=[], sign_in_date=False):
+                 username=False, activity=[], sign_in_date=False, name_only=False):
 
         self.gitlab_id = gitlab_id
         self.email_only = email_only
+        self.name_only = name_only
         self.export_keys = export_keys
         self.username = username
         self.activity = activity
@@ -114,6 +115,8 @@ class GLUsers(object):
         """Return info for given user"""
         if self.email_only:
             info = gl_user.email
+        elif self.name_only:
+            info = gl_user.name
         else:
             info = u"{} <{}>".format(str(gl_user.name), gl_user.email)
             # Complete with additional info
@@ -480,6 +483,11 @@ def main():
                         default=False,
                         help="Display only e-mail address")
 
+    parser.add_argument('--name-only', dest='name_only',
+                        action='store_true',
+                        default=False,
+                        help="Display only name")
+
     arg_show = parser.add_argument_group('Additional info')
 
     arg_show.add_argument('--sign-in-date', dest='sign_in_date',
@@ -546,14 +554,15 @@ def main():
         if args.g:
             glu = GLGroups(args.g, args.gitlab, args.email_only,
                            args.export_keys, args.username, activity,
-                           args.sign_in_date)
+                           args.sign_in_date, args.name_only)
         elif args.u:
             glu = GLSingleUser(args.u, args.gitlab, args.email_only,
                                args.export_keys, args.username, activity,
-                               args.sign_in_date)
+                               args.sign_in_date, args.name_only)
         else:
-            glu = GLUsers(args.gitlab, args.email_only, args.export_keys,
-                          args.username, activity, args.sign_in_date)
+            glu = GLUsers(args.gitlab, args.email_only,
+                          args.export_keys, args.username, activity,
+                          args.sign_in_date, args.name_only)
 
         glu.output()
 
