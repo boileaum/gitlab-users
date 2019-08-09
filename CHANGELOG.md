@@ -1,3 +1,7 @@
+## Version 0.8.3 - 2019-08-09
+
+- Add `--name-only` option (thanks to @jordiromera)
+
 ## Version 0.8.2 - 2019-03-28
 
 - Use requirements.txt for project packaging

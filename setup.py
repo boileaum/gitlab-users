@@ -16,7 +16,7 @@ with open('requirements.txt') as f:
 
 setup(
     name="gitlab-users",
-    version="0.8.2",
+    version="0.8.3",
     packages=find_packages(),
     entry_points={
         'console_scripts': ['gitlab-users = gitlab_users.gitlab_users:main'],
