@@ -81,10 +81,11 @@ class GLUsers(object):
     """A mother class to handle gitlab users"""
 
     def __init__(self, gitlab_id=None, email_only=False, export_keys=False,
-                 username=False, activity=[], sign_in_date=False):
+                 username=False, activity=[], sign_in_date=False, name_only=False):
 
         self.gitlab_id = gitlab_id
         self.email_only = email_only
+        self.name_only = name_only
         self.export_keys = export_keys
         self.username = username
         self.activity = activity
@@ -114,6 +115,8 @@ class GLUsers(object):
         """Return info for given user"""
         if self.email_only:
             info = gl_user.email
+        elif self.name_only:
+            info = gl_user.name
         else:
             info = u"{} <{}>".format(str(gl_user.name), gl_user.email)
             # Complete with additional info
@@ -233,7 +236,7 @@ class GLGroups(GLUsers):
 
             if not gl_groups:
                 print("No group matching {} found on {}.".format(self.groups,
-                      self.url))
+                                                                 self.url))
                 print(self.list_all_groups())
                 sys.exit(1)
             for gl_group in gl_groups:
@@ -291,7 +294,7 @@ class NewUser():
             # save group info and delete from userdict
             if self.userdict['access_level'] not in ACCESS_LEVEL.keys():
                 sys.exit("Wrong access level: {} for group {}".format(
-                        self.userdict['access_level'], self.userdict['group']))
+                    self.userdict['access_level'], self.userdict['group']))
             else:
                 self.group = {'name': self.userdict['group'],
                               'access_level': self.userdict['access_level']}
@@ -316,8 +319,8 @@ class NewUser():
         for entry in 'username', 'email', 'name':
             if self.userdict[entry] in gl[entry + 's']:
                 print("{} {} already used".format(
-                       entry.title(),
-                       self.userdict[entry]))
+                    entry.title(),
+                    self.userdict[entry]))
                 checkok = False
 
         if self.group:
@@ -325,14 +328,15 @@ class NewUser():
                 self.gl.groups.get(self.group['name'])
             except gitlab.GitlabGetError as e:
                 if e.response_body == 'Group Not Found':
-                    print('Group "{}" does not exist.'.format(self.group['name']))
+                    print('Group "{}" does not exist.'.format(
+                        self.group['name']))
                     newgroup_url = self.url + "/admin/groups/new"
                     print("Create it using GitLab using this link: {}"
                           .format(newgroup_url))
                     checkok = False
                 else:
                     raise
-              
+
         if checkok:
             print("... OK")
 
@@ -349,13 +353,13 @@ class NewUser():
         print("    User {} created".format(self.userdict['username']))
 
     def _add_to_group(self):
-        
+
         def get_subgroup(group, subgroup):
             """Return a subgroup object"""
             subgroup = group.get(372)
             subgroup = ""
             return subgroup
-        
+
         print("Adding to group...")
         if self.group:
             try:
@@ -369,7 +373,7 @@ class NewUser():
             group.members.create({'user_id': self.gluser.id,
                                   'access_level': access_level})
             print("    User {} added to group {}".format(
-                   self.userdict['username'], self.group['name']))
+                self.userdict['username'], self.group['name']))
         else:
             sys.exit("No group for this new user")
 
@@ -381,7 +385,7 @@ class NewUser():
 
         else:
             print("\nWARNING: user {} will not be created\n".format(
-                    self.userdict['username']))
+                self.userdict['username']))
 
     def __repr__(self):
         """Return a pretty output of user info"""
@@ -415,7 +419,7 @@ class OldUser():
     def delete(self):
         if self.skip_user:
             print("WARNING: user {} will not be deleted".format(
-                    self.username))
+                self.username))
         else:
             print("User {}:".format(self.gl_user.username))
             print("    Name: {}".format(self.gl_user.name))
@@ -478,6 +482,11 @@ def main():
                         action='store_true',
                         default=False,
                         help="Display only e-mail address")
+
+    parser.add_argument('--name-only', dest='name_only',
+                        action='store_true',
+                        default=False,
+                        help="Display only name")
 
     arg_show = parser.add_argument_group('Additional info')
 
@@ -545,16 +554,18 @@ def main():
         if args.g:
             glu = GLGroups(args.g, args.gitlab, args.email_only,
                            args.export_keys, args.username, activity,
-                           args.sign_in_date)
+                           args.sign_in_date, args.name_only)
         elif args.u:
             glu = GLSingleUser(args.u, args.gitlab, args.email_only,
                                args.export_keys, args.username, activity,
-                               args.sign_in_date)
+                               args.sign_in_date, args.name_only)
         else:
-            glu = GLUsers(args.gitlab, args.email_only, args.export_keys,
-                          args.username, activity, args.sign_in_date)
+            glu = GLUsers(args.gitlab, args.email_only,
+                          args.export_keys, args.username, activity,
+                          args.sign_in_date, args.name_only)
 
         glu.output()
+
 
 if __name__ == "__main__":
     main()
