@@ -81,7 +81,7 @@ class GLUsers(object):
     """A mother class to handle gitlab users"""
 
     def __init__(self, gitlab_id=None, email_only=False, export_keys=False,
-                 username=False, activity=[], sign_in_date=False, name_only=False):
+                 username=False, activity=None, sign_in_date=False, name_only=False):
 
         self.gitlab_id = gitlab_id
         self.email_only = email_only
@@ -92,7 +92,7 @@ class GLUsers(object):
         self.sign_in_date = sign_in_date
 
         self.gl = connect_to_gitlab(self.gitlab_id)
-        self.url = self.gl._url
+        self.url = self.gl.api_url
         self.all_gl_users = self.gl.users.list(all=True)
         self.alluser_ids = [gl_user.id for gl_user in self.all_gl_users]
 
@@ -100,7 +100,8 @@ class GLUsers(object):
         self.userdict = {key: value for (key, value)
                          in zip(self.alluser_ids, self.all_gl_users)}
 
-    def _sign_in_date(self, gl_user):
+    @staticmethod
+    def _sign_in_date(gl_user):
         """Return user sign-in date"""
         if gl_user.current_sign_in_at:
             return gl_user.current_sign_in_at.split('T')[0]
@@ -133,7 +134,7 @@ class GLUsers(object):
             msg = msg + "\n - {}".format(username)
         return msg
 
-    def print_users(self, user_ids, groupname=None):
+    def print_users(self, user_ids):
         """Print info for a list of users"""
 
         nokey_gl_users = []
@@ -244,7 +245,7 @@ class GLGroups(GLUsers):
                             in gl_group.members.list(all=True)]
                 print("  Group {} ({} members):".format(gl_group.name,
                                                         len(user_ids)))
-                self.print_users(user_ids, groupname=gl_group.name)
+                self.print_users(user_ids)
 
 
 class GLSingleUser(GLUsers):
@@ -287,7 +288,7 @@ class NewUser():
 
     def __init__(self, userdict):
         self.gl = connect_to_gitlab()
-        self.url = self.gl._url
+        self.url = self.gl.api_url
         self.all_gl_users = self.gl.users.list(all=True)
         self.userdict = userdict
         if self.userdict['group']:
@@ -309,12 +310,13 @@ class NewUser():
         print("Checking...")
         print(self)
 
-        gl = {}
-        gl['usernames'] = [gl_user.username for gl_user in self.all_gl_users]
-        gl['emails'] = [gl_user.email for gl_user in self.all_gl_users]
-        gl['names'] = [gl_user.name for gl_user in self.all_gl_users]
-        gl['groupnames'] = [gl_group.name for gl_group in
-                            self.gl.groups.list(all=True)]
+        gl = {'usernames': [gl_user.username for gl_user in self.all_gl_users],
+              'emails': [gl_user.email for gl_user in self.all_gl_users],
+              'names': [gl_user.name for gl_user in self.all_gl_users],
+              'groupnames': [gl_group.name for gl_group in
+                             self.gl.groups.list(all=True)]
+              }
+
         checkok = True
         for entry in 'username', 'email', 'name':
             if self.userdict[entry] in gl[entry + 's']:
@@ -353,12 +355,6 @@ class NewUser():
         print("    User {} created".format(self.userdict['username']))
 
     def _add_to_group(self):
-
-        def get_subgroup(group, subgroup):
-            """Return a subgroup object"""
-            subgroup = group.get(372)
-            subgroup = ""
-            return subgroup
 
         print("Adding to group...")
         if self.group:
@@ -407,7 +403,7 @@ class OldUser():
     def __init__(self, username):
         self.username = username
         self.gl = connect_to_gitlab()
-        self.url = self.gl._url
+        self.url = self.gl.api_url
         gl_user_list = self.gl.users.list(username=self.username)
         if gl_user_list:
             self.gl_user = gl_user_list[0]
