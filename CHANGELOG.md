@@ -1,3 +1,7 @@
+## Version 0.8.4 - 2019-09-12
+
+- Add a `-n, --dry-run` option for user creation and deletion
+
 ## Version 0.8.3 - 2019-08-09
 
 - Add `--name-only` option (thanks to @jordiromera)

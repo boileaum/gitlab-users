@@ -81,7 +81,8 @@ class GLUsers(object):
     """A mother class to handle gitlab users"""
 
     def __init__(self, gitlab_id=None, email_only=False, export_keys=False,
-                 username=False, activity=None, sign_in_date=False, name_only=False):
+                 username=False, activity=None, sign_in_date=False,
+                 name_only=False):
 
         self.gitlab_id = gitlab_id
         self.email_only = email_only
@@ -383,7 +384,7 @@ class NewUser():
         else:
             warn = "Dry run mode" if self.dry_run else "WARNING"
             print("\n{}: user {} will not be created\n".format(warn,
-                self.userdict['username']))
+                  self.userdict['username']))
 
     def __repr__(self):
         """Return a pretty output of user info"""
@@ -428,8 +429,10 @@ class OldUser():
                 self.gl_user.delete()
                 print("    User {} deleted".format(self.username))
             else:
-                message = "dry run mode" if self.dry_run else "deletion aborted"
-                print("    User {} not deleted ({})".format(self.username, message))
+                message = "dry run mode" if self.dry_run \
+                          else "deletion aborted"
+                print("    User {} not deleted ({})".format(self.username,
+                                                            message))
 
 
 def get_usernames_from_csv(filename):
