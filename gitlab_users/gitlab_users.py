@@ -286,11 +286,12 @@ class GLSingleUser(GLUsers):
 class NewUser():
     """A class to create a user"""
 
-    def __init__(self, userdict):
+    def __init__(self, userdict, dry_run=False):
         self.gl = connect_to_gitlab()
         self.url = self.gl.api_url
         self.all_gl_users = self.gl.users.list(all=True)
         self.userdict = userdict
+        self.dry_run = dry_run
         if self.userdict['group']:
             # save group info and delete from userdict
             if self.userdict['access_level'] not in ACCESS_LEVEL.keys():
@@ -374,13 +375,14 @@ class NewUser():
             sys.exit("No group for this new user")
 
     def save(self):
-        if self._check():
+        if self._check() and not self.dry_run:
             self._create()
             if self.group:
                 self._add_to_group()
 
         else:
-            print("\nWARNING: user {} will not be created\n".format(
+            warn = "Dry run mode" if self.dry_run else "WARNING"
+            print("\n{}: user {} will not be created\n".format(warn,
                 self.userdict['username']))
 
     def __repr__(self):
@@ -400,8 +402,9 @@ class NewUser():
 class OldUser():
     """Handle old users to delete"""
 
-    def __init__(self, username):
+    def __init__(self, username, dry_run=False):
         self.username = username
+        self.dry_run = dry_run
         self.gl = connect_to_gitlab()
         self.url = self.gl.api_url
         gl_user_list = self.gl.users.list(username=self.username)
@@ -415,17 +418,18 @@ class OldUser():
     def delete(self):
         if self.skip_user:
             print("WARNING: user {} will not be deleted".format(
-                self.username))
+                  self.username))
         else:
             print("User {}:".format(self.gl_user.username))
             print("    Name: {}".format(self.gl_user.name))
             print("    Email: {}".format(self.gl_user.email))
 
-            if query_yes_no("Delete?", default="no"):
+            if not self.dry_run and query_yes_no("Delete?", default="no"):
                 self.gl_user.delete()
                 print("    User {} deleted".format(self.username))
             else:
-                print("    User {} not deleted".format(self.username))
+                message = "dry run mode" if self.dry_run else "deletion aborted"
+                print("    User {} not deleted ({})".format(self.username, message))
 
 
 def get_usernames_from_csv(filename):
@@ -519,25 +523,27 @@ def main():
                            dest='delete', metavar="username",
                            help="Delete user")
 
+    parser.add_argument('-n', '--dry-run', dest='dry_run', action='store_true',
+                        help=("Do not commit any change"))
     args = parser.parse_args()
 
     if args.create:
         create_file = args.create[0]
         newuserdicts = get_users_from_csv(create_file)
         for userdict in newuserdicts:
-            newuser = NewUser(userdict)
+            newuser = NewUser(userdict, dry_run=args.dry_run)
             newuser.save()
 
     elif args.delete_from:
         oldusernames = get_usernames_from_csv(args.delete_from[0])
 
         for username in oldusernames:
-            olduser = OldUser(username)
+            olduser = OldUser(username, dry_run=args.dry_run)
             olduser.delete()
 
     elif args.delete:
         username = args.delete[0]
-        olduser = OldUser(username)
+        olduser = OldUser(username, dry_run=args.dry_run)
         olduser.delete()
 
     else:
