@@ -67,7 +67,8 @@ def connect_to_gitlab(gitlab_id=None):
     """Return a connection to GitLab API"""
     try:
         gl = gitlab.Gitlab.from_config(gitlab_id)
-    except (gitlab.config.GitlabIDError, gitlab.config.GitlabDataError) as e:
+    except (gitlab.config.GitlabIDError, gitlab.config.GitlabDataError,
+            gitlab.config.GitlabConfigMissingError) as e:
         print("Exception in python-gitlab: {}.\n".format(e),
               "Check python-gitlab configuration on",
               "http://python-gitlab.readthedocs.io/en/stable/cli.html",
