@@ -1,3 +1,7 @@
+## Version 0.8.5 - 2021-12-07
+
+- Add a `--csv` option to output csv structured data
+
 ## Version 0.8.4 - 2019-09-12
 
 - Add a `-n, --dry-run` option for user creation and deletion
