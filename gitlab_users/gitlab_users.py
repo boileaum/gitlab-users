@@ -227,7 +227,7 @@ class GLUsers(object):
     def user_info_csv(self, gl_user):
         """Return info for given user in csv"""
         ## Username, E-mail, Name, State, isAdmin, isExternal, LastSignInAt, CreatedAt
-        info = u"{},{},\"{}\",{},{},{},{}".format(gl_user.username, gl_user.email, str(gl_user.name), gl_user.state, gl_user.is_admin, gl_user.external, self._format_date(gl_user,"last_sign_in_at"), self._format_date(gl_user,"created_at"))
+        info = u"{},{},\"{}\",{},{},{},{},{}".format(gl_user.username, gl_user.email, str(gl_user.name), gl_user.state, gl_user.is_admin, gl_user.external, self._format_date(gl_user,"last_sign_in_at"), self._format_date(gl_user,"created_at"))
         # Complete with additional info
         return info
 
