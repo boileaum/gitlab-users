@@ -1,3 +1,8 @@
+## Version 0.8.5 - 2022-01-18
+
+- Add '--active' option for listing active users (last connection is < 1 year)
+- Limit to python-gitlab < 3.0.0 for compatibility
+
 ## Version 0.8.4 - 2019-09-12
 
 - Add a `-n, --dry-run` option for user creation and deletion
