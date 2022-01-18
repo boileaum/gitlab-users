@@ -176,12 +176,12 @@ class GLUsers(object):
 
     def output(self):
         """Output users information"""
-
         if self.activity:
 
             old_sign_in = []
             never_sign_in = []
             already_sign_in = []
+            active = []
             for gl_user in self.all_gl_users:
                 # Find the last connexion date
                 # Split using the T between date and hours
@@ -193,6 +193,8 @@ class GLUsers(object):
                         if current_sign_in < datetime.now() - \
                            timedelta(days=365):
                             old_sign_in.append(gl_user)
+                        else:
+                            active.append(gl_user)
                 elif gl_user.state == 'active':
                     never_sign_in.append(gl_user)
 
@@ -208,6 +210,12 @@ class GLUsers(object):
                 print("  Users who have already signed in:")
                 for gl_user in already_sign_in:
                     print(self.user_info(gl_user))
+            
+            elif 'active' in self.activity:
+                print(f"""\
+  Active users (last connection < 1 year) [{len(active)}]:""")
+                for gl_user in active:
+                    print(self.user_info(gl_user))               
         else:
             self.print_users(self.alluser_ids)
 
@@ -513,6 +521,9 @@ def main():
                               action='store_true', default=False,
                               help="Display only users that have already \
                               signed in")
+    arg_activity.add_argument('--active', dest='active',
+                              action='store_true', default=False,
+                              help="Display only active users")
 
     arg_group = parser.add_mutually_exclusive_group()
     arg_group.add_argument('--create-from', nargs=1, required=False,
@@ -554,7 +565,8 @@ def main():
         # Print info to standard output
 
         activityd = {'unused': args.unused,
-                     'sign_in': args.sign_in}
+                     'sign_in': args.sign_in,
+                     'active': args.active}
         activity = [key for key in activityd.keys() if activityd[key]]
 
         if args.g:
