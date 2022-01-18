@@ -12,7 +12,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 # Read requirements from file
 with open('requirements.txt') as f:
-        requirements = f.read().splitlines()
+    requirements = f.read().splitlines()
 
 setup(
     name="gitlab-users",
@@ -20,7 +20,7 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': ['gitlab-users = gitlab_users.gitlab_users:main'],
-                 },
+    },
     package_data={},
 
     # metadata for upload to PyPI
