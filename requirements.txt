@@ -1,2 +1,2 @@
 future
-python-gitlab>0.20
+python-gitlab>0.20,<3.0.0
