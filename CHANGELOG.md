@@ -1,3 +1,7 @@
+## Version 0.8.6 - 2022-04-27
+
+- Passing a gitlab connection to GLUser class and children is now possible
+
 ## Version 0.8.5 - 2022-01-18
 
 - Add `--active` option for listing active users (last connection is < 1 year)

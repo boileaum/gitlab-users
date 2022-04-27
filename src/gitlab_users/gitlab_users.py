@@ -83,7 +83,7 @@ class GLUsers(object):
 
     def __init__(self, gitlab_id=None, email_only=False, export_keys=False,
                  username=False, activity=None, sign_in_date=False,
-                 name_only=False):
+                 name_only=False, gl=None):
 
         self.gitlab_id = gitlab_id
         self.email_only = email_only
@@ -93,7 +93,7 @@ class GLUsers(object):
         self.activity = activity
         self.sign_in_date = sign_in_date
 
-        self.gl = connect_to_gitlab(self.gitlab_id)
+        self.gl = connect_to_gitlab(self.gitlab_id) if gl is None else gl
         self.url = self.gl.api_url
         self.all_gl_users = self.gl.users.list(all=True)
         self.alluser_ids = [gl_user.id for gl_user in self.all_gl_users]
