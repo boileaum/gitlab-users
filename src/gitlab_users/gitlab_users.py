@@ -83,7 +83,7 @@ class GLUsers(object):
 
     def __init__(self, gitlab_id=None, email_only=False, export_keys=False,
                  username=False, activity=None, sign_in_date=False,
-                 name_only=False):
+                 name_only=False, gl=None):
 
         self.gitlab_id = gitlab_id
         self.email_only = email_only
@@ -93,7 +93,7 @@ class GLUsers(object):
         self.activity = activity
         self.sign_in_date = sign_in_date
 
-        self.gl = connect_to_gitlab(self.gitlab_id)
+        self.gl = connect_to_gitlab(self.gitlab_id) if gl is None else gl
         self.url = self.gl.api_url
         self.all_gl_users = self.gl.users.list(all=True)
         self.alluser_ids = [gl_user.id for gl_user in self.all_gl_users]
@@ -184,6 +184,7 @@ class GLUsers(object):
         old_sign_in = []
         never_sign_in = []
         already_sign_in = []
+        active = []
         for gl_user in self.all_gl_users:
             # Find the last connexion date
             # Split using the T between date and hours
@@ -195,16 +196,18 @@ class GLUsers(object):
                     if current_sign_in < datetime.now() - \
                        timedelta(days=365):
                         old_sign_in.append(gl_user)
+                    else:
+                        active.append(gl_user)
             elif gl_user.state == 'active':
                 never_sign_in.append(gl_user)
 
-        return (old_sign_in,never_sign_in,already_sign_in)
+        return (old_sign_in,never_sign_in,already_sign_in,active)
 
     def output(self):
         """Output users information"""
-
         if self.activity:
-            (old_sign_in, never_sign_in, already_sign_in) = self._getactivity()
+            (old_sign_in, never_sign_in, already_sign_in,active) = self._getactivity()
+
             if 'unused' in self.activity:
                 print("  Users whose last connexion is older than 1 year:")
                 for gl_user in old_sign_in:
@@ -217,6 +220,12 @@ class GLUsers(object):
                 print("  Users who have already signed in:")
                 for gl_user in already_sign_in:
                     print(self.user_info(gl_user))
+            
+            elif 'active' in self.activity:
+                print(f"""\
+  Active users (last connection < 1 year) [{len(active)}]:""")
+                for gl_user in active:
+                    print(self.user_info(gl_user))               
         else:
             self.print_users(self.alluser_ids)
 
@@ -242,7 +251,7 @@ class GLUsers(object):
         """Output csv of all users"""
         print("Username,E-mail,\"Name\",State,isAdmin,isExternal,LastSignInAt,CreatedAt")
         if self.activity:
-            (old_sign_in, never_sign_in, already_sign_in) = self._getactivity()
+            (old_sign_in, never_sign_in, already_sign_in,active) = self._getactivity()
             if 'unused' in self.activity:
                 #print("  Users whose last connexion is older than 1 year:")
                 #print("  Users who never signed in:")
@@ -251,6 +260,9 @@ class GLUsers(object):
             elif 'sign_in' in self.activity:
                 #print("  Users who have already signed in:")
                 self.print_users_csv(self._getuids(already_sign_in))
+            elif 'active' in self.activity:
+                #print(f"""Active users (last connection < 1 year) [{len(active)}]:""")
+                self.print_users_csv(self._getuids(active))
         else:
             self.print_users_csv(self.alluser_ids)
 
@@ -556,6 +568,9 @@ def main():
                               action='store_true', default=False,
                               help="Display only users that have already \
                               signed in")
+    arg_activity.add_argument('--active', dest='active',
+                              action='store_true', default=False,
+                              help="Display only active users")
 
     arg_group = parser.add_mutually_exclusive_group()
     arg_group.add_argument('--create-from', nargs=1, required=False,
@@ -601,7 +616,8 @@ def main():
         # Print info to standard output
 
         activityd = {'unused': args.unused,
-                     'sign_in': args.sign_in}
+                     'sign_in': args.sign_in,
+                     'active': args.active}
         activity = [key for key in activityd.keys() if activityd[key]]
 
         if args.g:

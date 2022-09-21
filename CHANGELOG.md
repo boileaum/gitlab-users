@@ -1,6 +1,15 @@
-## Version 0.8.5 - 2021-12-07
+## Version 0.8.7 - 2022-09-21
 
 - Add a `--csv` option to output csv structured data
+
+## Version 0.8.6 - 2022-04-27
+
+- Passing a gitlab connection to GLUser class and children is now possible
+
+## Version 0.8.5 - 2022-01-18
+
+- Add `--active` option for listing active users (last connection is < 1 year)
+- Limit to python-gitlab < 3.0.0 for compatibility
 
 ## Version 0.8.4 - 2019-09-12
 
