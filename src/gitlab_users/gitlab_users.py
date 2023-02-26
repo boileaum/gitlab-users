@@ -19,6 +19,7 @@ from datetime import datetime, timedelta
 import gitlab
 import os
 import sys
+import json
 
 
 ACCESS_LEVEL = {'guest': gitlab.GUEST_ACCESS,
@@ -404,11 +405,16 @@ class NewUser():
 
     def _create(self):
         print("Creating...")
+        print(self.userdict)
         self.gluser = self.gl.users.create(self.userdict)
         # 'organization' and 'location' field are not created by current
         # version of python-gitlab (0.20) so add them using .save() method
         self.gluser.organization = self.userdict['organization']
         self.gluser.location = self.userdict['location']
+        self.gluser.external = json.loads(self.userdict['external'].lower())
+        self.gluser.can_create_group = json.loads(self.userdict['can_create_group'].lower())
+        self.gluser.skip_confirmation = json.loads(self.userdict['skip_confirmation'].lower())
+        self.gluser.projects_limit = int(self.userdict['projects_limit'])
         self.gluser.save()
         print("    User {} created".format(self.userdict['username']))
 
@@ -493,7 +499,7 @@ class OldUser():
 
 def get_usernames_from_csv(filename):
     """Return a list of usernames"""
-    with open(filename, 'r') as csvfile:
+    with open(filename, 'r', encoding='utf-8-sig') as csvfile:
         csvreader = csv.reader(row for row in csvfile
                                if not row.startswith('#'))
         return [row[0] for row in csvreader]
@@ -501,9 +507,9 @@ def get_usernames_from_csv(filename):
 
 def get_users_from_csv(filename):
     """Return a dict containing users information"""
-    with open(filename, 'r') as csvfile:
+    with open(filename, 'r', encoding='utf-8-sig') as csvfile:
         fieldnames = 'username', 'name', 'email', 'organization', 'location', \
-                     'group', 'access_level'
+                     'group', 'access_level', 'can_create_group', 'external', 'skip_confirmation', 'projects_limit'
         # Filter csv file header
         csvreader = csv.reader(row for row in csvfile
                                if not row.startswith('#'))
