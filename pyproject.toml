@@ -19,6 +19,8 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
+[project.optional-dependencies]
+dev = ["ruff", "black", "pytest", "build", "python-gitlab"]
 [project.urls]
 Homepage = "https://github.com/boileaum/gitlab-users"
 
