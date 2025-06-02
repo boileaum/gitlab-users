@@ -1,6 +1,6 @@
-import sys
-import os
 import importlib
+import os
+import sys
 
 
 def test_import():

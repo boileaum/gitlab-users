@@ -22,14 +22,13 @@ import sys
 from datetime import datetime, timedelta
 
 import gitlab
-
 from gitlab.const import AccessLevel
 
 ACCESS_LEVEL = {
     "guest": AccessLevel.GUEST,
     "reporter": AccessLevel.REPORTER,
     "developer": AccessLevel.DEVELOPER,
-    "master": AccessLevel.MAINTAINER,  # "master" est un alias historique de "maintainer"
+    "master": AccessLevel.MAINTAINER,
     "maintainer": AccessLevel.MAINTAINER,
     "owner": AccessLevel.OWNER,
 }
