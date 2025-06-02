@@ -129,6 +129,11 @@ class GLUsers(object):
         else:
             return None
 
+    @staticmethod
+    def _sign_in_date(gl_user):
+        """Return user sign-in date"""
+        return __class__._format_date(gl_user, "current_sign_in_at")
+
     def _sign_in_date_and_time(self, gl_user):
         """Return user sign-in date and time"""
         return datetime.strptime(self._sign_in_date(gl_user), "%Y-%m-%d")
@@ -156,7 +161,7 @@ class GLUsers(object):
         return msg
 
     def print_users(self, user_ids):
-        """Print info for a list of users"""
+        """Print info for a list of users and collect ssh_keys"""
 
         nokey_gl_users = []
 
@@ -192,28 +197,33 @@ class GLUsers(object):
                     print(self.user_info(gl_user))
                 print("--")
 
+    def _getactivity(self):
+
+        old_sign_in = []
+        never_sign_in = []
+        already_sign_in = []
+        active = []
+        for gl_user in self.all_gl_users:
+            # Find the last connexion date
+            # Split using the T between date and hours
+            # Do not care about minutes...
+            if gl_user.current_sign_in_at:
+                current_sign_in = self._sign_in_date_and_time(gl_user)
+                if gl_user.state == "active":
+                    already_sign_in.append(gl_user)
+                    if current_sign_in < datetime.now() - timedelta(days=365):
+                        old_sign_in.append(gl_user)
+                    else:
+                        active.append(gl_user)
+            elif gl_user.state == "active":
+                never_sign_in.append(gl_user)
+
+        return (old_sign_in, never_sign_in, already_sign_in, active)
+
     def output(self):
         """Output users information"""
         if self.activity:
-
-            old_sign_in = []
-            never_sign_in = []
-            already_sign_in = []
-            active = []
-            for gl_user in self.all_gl_users:
-                # Find the last connexion date
-                # Split using the T between date and hours
-                # Do not care about minutes...
-                if gl_user.current_sign_in_at:
-                    current_sign_in = self._sign_in_date_and_time(gl_user)
-                    if gl_user.state == "active":
-                        already_sign_in.append(gl_user)
-                        if current_sign_in < datetime.now() - timedelta(days=365):
-                            old_sign_in.append(gl_user)
-                        else:
-                            active.append(gl_user)
-                elif gl_user.state == "active":
-                    never_sign_in.append(gl_user)
+            (old_sign_in, never_sign_in, already_sign_in, active) = self._getactivity()
 
             if "unused" in self.activity:
                 print("  Users whose last connexion is older than 1 year:")
@@ -237,6 +247,52 @@ class GLUsers(object):
                     print(self.user_info(gl_user))
         else:
             self.print_users(self.alluser_ids)
+
+    @staticmethod
+    def _getuids(gl_users):
+        return [gu.id for gu in gl_users]
+
+    def user_info_csv(self, gl_user):
+        """Return info for given user in csv"""
+        ## Username, E-mail, Name, State, isAdmin, isExternal, LastSignInAt, CreatedAt
+        info = '{},{},"{}",{},{},{},{},{}'.format(
+            gl_user.username,
+            gl_user.email,
+            str(gl_user.name),
+            gl_user.state,
+            gl_user.is_admin,
+            gl_user.external,
+            self._format_date(gl_user, "last_sign_in_at"),
+            self._format_date(gl_user, "created_at"),
+        )
+        # Complete with additional info
+        return info
+
+    def print_users_csv(self, user_ids):
+        """Print csv listing of users"""
+
+        for user_id in user_ids:
+            gl_user = self.userdict[user_id]
+            print(self.user_info_csv(gl_user))
+
+    def out_csv(self):
+        """Output csv of all users"""
+        print('Username,E-mail,"Name",State,isAdmin,isExternal,LastSignInAt,CreatedAt')
+        if self.activity:
+            (old_sign_in, never_sign_in, already_sign_in, active) = self._getactivity()
+            if "unused" in self.activity:
+                # print("  Users whose last connexion is older than 1 year:")
+                # print("  Users who never signed in:")
+                self.print_users_csv(self._getuids(old_sign_in + never_sign_in))
+
+            elif "sign_in" in self.activity:
+                # print("  Users who have already signed in:")
+                self.print_users_csv(self._getuids(already_sign_in))
+            elif "active" in self.activity:
+                # print(f"""Active users (last connection < 1 year) [{len(active)}]:""")
+                self.print_users_csv(self._getuids(active))
+        else:
+            self.print_users_csv(self.alluser_ids)
 
 
 class GLGroups(GLUsers):
@@ -635,6 +691,15 @@ def main():
         help="Delete user",
     )
 
+    arg_group.add_argument(
+        "--csv",
+        action="store_true",
+        required=False,
+        dest="csv_out",
+        default=False,
+        help="CSV output with detailed information",
+    )
+
     parser.add_argument(
         "-n",
         "--dry-run",
@@ -705,8 +770,10 @@ def main():
                 args.sign_in_date,
                 args.name_only,
             )
-
-        glu.output()
+        if args.csv_out:
+            glu.out_csv()
+        else:
+            glu.output()
 
 
 if __name__ == "__main__":

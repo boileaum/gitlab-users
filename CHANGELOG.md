@@ -1,3 +1,7 @@
+## Version 0.8.7 - 2022-09-21
+
+- Add a `--csv` option to output csv structured data
+
 ## Version 0.8.6 - 2022-04-27
 
 - Passing a gitlab connection to GLUser class and children is now possible
