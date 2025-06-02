@@ -20,10 +20,12 @@ classifiers = [
 
 [project.optional-dependencies]
 dev = ["ruff", "black", "pytest", "build", "python-gitlab"]
-[tool.setuptools.dynamic]
-version = {attr = "gitlab_users.__version__"}
+
 [project.urls]
 Homepage = "https://github.com/boileaum/gitlab-users"
+
+[tool.setuptools.dynamic]
+version = { attr = "gitlab_users.__version__" }
 
 [tool.setuptools]
 package-dir = { "" = "src" }
