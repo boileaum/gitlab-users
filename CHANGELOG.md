@@ -1,3 +1,15 @@
+## Unreleased
+
+### Changed
+
+- Update dependencies to latest version of python-gitlab
+- use a pyproject.toml file for packaging
+
+### Added
+
+- some tests for the CLI commands
+- CI pipeline with GitHub Actions
+
 ## Version 0.8.7 - 2022-09-21
 
 - Add a `--csv` option to output csv structured data
