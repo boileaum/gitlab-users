@@ -1,9 +1,10 @@
-## Unreleased
+## Version 1.0.1 - 2025-06-02
 
 ### Changed
 
 - Update dependencies to latest version of python-gitlab
 - use a pyproject.toml file for packaging
+- update CONTRIBUTING.md for development and release instructions
 
 ### Added
 
