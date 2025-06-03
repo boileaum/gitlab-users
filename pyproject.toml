@@ -10,8 +10,8 @@ authors = [
     { name = "Matthieu Boileau", email = "matthieu.boileau@math.unistra.fr" },
 ]
 license = { file = "LICENSE" }
-requires-python = ">=3.6"
-dependencies = ["python-gitlab"]
+requires-python = ">=3.9"
+dependencies = ["python-gitlab>=5.0.0"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -20,7 +20,7 @@ classifiers = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-dev = ["ruff", "black", "pytest", "build", "python-gitlab"]
+dev = ["ruff", "black", "pytest", "build"]
 
 [project.urls]
 Homepage = "https://github.com/boileaum/gitlab-users"
@@ -41,7 +41,6 @@ gitlab-users = "gitlab_users.gitlab_users:main"
 [tool.black]
 line-length = 88
 target-version = ['py37']
-
 
 [tool.ruff]
 line-length = 88
