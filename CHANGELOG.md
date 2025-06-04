@@ -1,8 +1,17 @@
+# Changelog
+
+## Version 1.0.4 - 2025-10-01
+
+### Added
+
+- documentation with Sphinx
+-
+
 ## Version 1.0.3 - 2025-06-02
 
 ### Changed
 
-- Update dependencies to latest version of python-gitlab
+- Update dependencies to latest version of python-gitlab (>=5.0.0)
 - use a pyproject.toml file for packaging
 - update CONTRIBUTING.md for development and release instructions
 

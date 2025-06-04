@@ -1,9 +1,8 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
 Use GitLab API to:
-    1) list gitlab users info
-    2) automate user account creation/deletion
+
+1. List GitLab users info
+2. Automate user account creation/deletion
 """
 
 from __future__ import annotations
@@ -31,14 +30,14 @@ ACCESS_LEVEL = {
 
 def query_yes_no(question: str, default: Optional[str] = "no") -> bool:
     """
-    Ask a yes/no question via input() and return the answer as a boolean.
+        Ask a yes/no question via input() and return the answer as a boolean.
 
-    Args:
-        question: The question to present to the user.
-        default: The presumed answer if the user just hits <Enter>.
+    - ``query_yes_no`` : Demande de    Args:
+            question: The question to present to the user.
+            default: The presumed answer if the user just hits <Enter>.
 
-    Returns:
-        True if the answer is yes, False if the answer is no.
+        Returns:
+            True if the answer is yes, False if the answer is no.
     """
     valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
     if default is None:
@@ -93,6 +92,17 @@ class GLUsers:
     """
     Main class to handle GitLab users and their information.
     Provides methods for listing, exporting, and analyzing users.
+
+    Args:
+        gitlab_id: Optional GitLab config section.
+        email_only: If True, only show emails.
+        export_keys: If True, export SSH keys.
+        username: If True, show usernames.
+        activity: List of activity filters ("unused", "sign_in", "active").
+        sign_in_date: If True, show last sign-in date.
+        name_only: If True, only show names.
+        gl: Optionally provide an existing gitlab.Gitlab instance.
+
     """
 
     def __init__(
@@ -106,19 +116,6 @@ class GLUsers:
         name_only: bool = False,
         gl: Optional[gitlab.Gitlab] = None,
     ):
-        """
-        Initialize the GLUsers handler.
-
-        Args:
-            gitlab_id: Optional GitLab config section.
-            email_only: If True, only show emails.
-            export_keys: If True, export SSH keys.
-            username: If True, show usernames.
-            activity: List of activity filters ("unused", "sign_in", "active").
-            sign_in_date: If True, show last sign-in date.
-            name_only: If True, only show names.
-            gl: Optionally provide an existing gitlab.Gitlab instance.
-        """
         self.gitlab_id = gitlab_id
         self.email_only = email_only
         self.name_only = name_only
@@ -210,7 +207,7 @@ class GLUsers:
             msg += f"\n - {username}"
         return msg
 
-    def print_users(self, user_ids: Sequence[int]) -> None:
+    def print_users(self, user_ids: Sequence[int]):
         """
         Print information for a list of users and optionally export SSH keys.
 
@@ -287,7 +284,7 @@ class GLUsers:
 
         return (old_sign_in, never_sign_in, already_sign_in, active)
 
-    def output(self) -> None:
+    def output(self):
         """
         Print user information to standard output, filtered by activity if set.
         """
@@ -330,29 +327,31 @@ class GLUsers:
         """
         return [gu.id for gu in gl_users]
 
-    def user_info_csv(self, gl_user: gitlab.v4.objects.UserManager) -> str:
+    def csv_user_line(self, gl_user: gitlab.v4.objects.UserManager) -> str:
         """
-        Get user information as a CSV-formatted string.
+        Return user information as a CSV-formatted string.
 
         Args:
             gl_user: The GitLab user object.
 
         Returns:
-            CSV string with user details.
+            CSV line containing user details.
         """
-        info = '{},{},"{}",{},{},{},{},{}'.format(
-            gl_user.username,
-            gl_user.email,
-            str(gl_user.name),
-            gl_user.state,
-            gl_user.is_admin,
-            gl_user.external,
-            self._format_date(gl_user, "last_sign_in_at"),
-            self._format_date(gl_user, "created_at"),
+        info = ",".join(
+            [
+                gl_user.username,
+                gl_user.email,
+                f'"{str(gl_user.name)}"',
+                gl_user.state,
+                str(gl_user.is_admin),
+                str(gl_user.external),
+                self._format_date(gl_user, "last_sign_in_at"),
+                self._format_date(gl_user, "created_at"),
+            ]
         )
         return info
 
-    def print_users_csv(self, user_ids: Sequence[int]) -> None:
+    def print_users_csv(self, user_ids: Sequence[int]):
         """
         Print a CSV listing of users.
 
@@ -362,9 +361,9 @@ class GLUsers:
 
         for user_id in user_ids:
             gl_user = self.userdict[user_id]
-            print(self.user_info_csv(gl_user))
+            print(self.csv_user_line(gl_user))
 
-    def out_csv(self) -> None:
+    def out_csv(self):
         """
         Output a CSV of all users, filtered by activity if set.
         """
@@ -387,7 +386,15 @@ class GLUsers:
 
 
 class GLGroups(GLUsers):
-    """A class to handle a group of gitlab users"""
+    """
+    Handle groups of gitlab users
+
+    Args:
+        groups: The name of the group to filter by, or "list" to list all groups.
+        *args: Additional positional arguments passed to GLUsers.
+        **kwargs: Additional keyword arguments passed to GLUsers.
+
+    """
 
     def __init__(self, groups: str, *args: Any, **kwargs: Any):
         self.groups = groups
@@ -395,13 +402,19 @@ class GLGroups(GLUsers):
         self.all_gl_groups = self.gl.groups.list(all=True)
 
     def list_all_groups(self) -> str:
+        """
+        List all groups in the GitLab instance.
+
+        Returns:
+            A string listing all group names.
+        """
         groupnames = [gl_group.name for gl_group in self.all_gl_groups]
         msg = f"Existing groups ({len(groupnames)}):"
         for groupname in sorted(groupnames):
             msg += f"\n - {groupname}"
         return msg
 
-    def output(self) -> None:
+    def output(self):
         """Output users information"""
 
         if self.groups == "list":
@@ -421,7 +434,7 @@ class GLGroups(GLUsers):
 
 
 class GLSingleUser(GLUsers):
-    """A class to handle a single gitlab user"""
+    """Handle a single gitlab user"""
 
     def __init__(self, user: str, *args: Any, **kwargs: Any):
         self.user = user
@@ -444,7 +457,7 @@ class GLSingleUser(GLUsers):
         else:
             print(f"No ssh key found for {self.gl_user.username}")
 
-    def output(self) -> None:
+    def output(self):
         """Output users information"""
 
         if self.user == "list":
@@ -455,7 +468,7 @@ class GLSingleUser(GLUsers):
 
 
 class NewUser:
-    """A class to create a user"""
+    """Create a user"""
 
     def __init__(self, userdict: Dict[str, Any], dry_run: bool = False):
         self.gl = connect_to_gitlab()
@@ -486,7 +499,7 @@ class NewUser:
         print("Checking...")
         print(self)
 
-        gl = {
+        gld = {
             "usernames": [gl_user.username for gl_user in self.all_gl_users],
             "emails": [gl_user.email for gl_user in self.all_gl_users],
             "names": [gl_user.name for gl_user in self.all_gl_users],
@@ -495,7 +508,7 @@ class NewUser:
 
         checkok = True
         for entry in "username", "email", "name":
-            if self.userdict[entry] in gl[entry + "s"]:
+            if self.userdict[entry] in gld[entry + "s"]:
                 print(f"{entry.title()} {self.userdict[entry]} already used")
                 checkok = False
 
@@ -516,7 +529,7 @@ class NewUser:
 
         return checkok
 
-    def _create(self) -> None:
+    def _create(self):
         print("Creating...")
         self.gluser = self.gl.users.create(self.userdict)
         # 'organization' and 'location' field are not created by current
@@ -526,7 +539,7 @@ class NewUser:
         self.gluser.save()
         print(f"    User {self.userdict['username']} created")
 
-    def _add_to_group(self) -> None:
+    def _add_to_group(self):
         print("Adding to group...")
         if self.group:
             try:
@@ -547,7 +560,9 @@ class NewUser:
         else:
             sys.exit("No group for this new user")
 
-    def save(self) -> None:
+    def save(self):
+        """Check user info and create user if everything is ok"""
+
         if self._check() and not self.dry_run:
             self._create()
             if self.group:
@@ -585,7 +600,7 @@ class OldUser:
             print(f"WARNING: user {self.username} does not exist")
             self.skip_user = True
 
-    def delete(self) -> None:
+    def delete(self):
         if self.skip_user:
             print(f"WARNING: user {self.username} will not be deleted")
         else:
@@ -632,7 +647,7 @@ def get_users_from_csv(filename: str) -> List[Dict[str, Any]]:
         return newusers
 
 
-def main() -> None:
+def main():
     """Get user input from command line and launch gitlab API"""
 
     description = "List GitLab users information and automate user accounts creation"

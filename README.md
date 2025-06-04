@@ -1,5 +1,9 @@
 # gitlab-users
 
+[![pipeline status](https://github.com/boileaum/gitlab-users/actions/workflows/test.yml/badge.svg)](https://github.com/boileaum/gitlab-users/actions)
+[![Latest Release](https://img.shields.io/github/v/release/boileaum/gitlab-users?label=release)](https://github.com/boileaum/gitlab-users/releases)
+[![Doc](https://img.shields.io/badge/doc-sphinx-blue)](https://boileaum.gitlab-users.pages.gitlab-tools/docs/)
+
 A simple command line interface to manage GitLab user accounts, based on [python-gitlab](https://github.com/python-gitlab/python-gitlab).
 
 ## Installation
