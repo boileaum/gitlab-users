@@ -1,57 +1,92 @@
 # gitlab-users
 
-[![pipeline status](https://github.com/boileaum/gitlab-users/actions/workflows/test.yml/badge.svg)](https://github.com/boileaum/gitlab-users/actions)
+[![CI](https://github.com/boileaum/gitlab-users/actions/workflows/test.yml/badge.svg)](https://github.com/boileaum/gitlab-users/actions)
 [![Latest Release](https://img.shields.io/github/v/release/boileaum/gitlab-users?label=release)](https://github.com/boileaum/gitlab-users/releases)
 [![Doc](https://img.shields.io/badge/doc-sphinx-blue)](https://boileaum.gitlab-users.pages.gitlab-tools/docs/)
 
-A simple command line interface to manage GitLab user accounts, based on [python-gitlab](https://github.com/python-gitlab/python-gitlab).
+A CLI and an API to manage GitLab user accounts, based on [python-gitlab](https://github.com/python-gitlab/python-gitlab).
+
+## Features
+
+- List users and groups from a GitLab instance
+- Export users to CSV
+- Bulk create/delete users from CSV
+- Export SSH keys
 
 ## Installation
-
-* Install the package on your system
 
 ```sh
 pip install gitlab-users
 ```
 
-* Edit the `~/.python-gitlab.cfg` following the [python-gitlab package instructions](http://python-gitlab.readthedocs.io/en/stable/cli.html) to setup the GitLab instance to connect with (present version only targets default instance).
+Requires Python 3.9+ and a valid `python-gitlab` configuration (`~/.python-gitlab.cfg`).
 
 ## Usage
 
-* Get help
-
+Get help and list all commands:
 ```sh
 gitlab-users -h
 ```
 
-* List all users with their email
-
+List all users:
 ```sh
-gitlab-users
+gitlab-users list-users
 ```
 
-* List emails from a given group
-
+List all groups:
 ```sh
-gitlab-users -g a_group --email-only
+gitlab-users list-groups
 ```
 
-* Create multiple user accounts at once from a csv file
-
+Export all users to a CSV file:
 ```sh
-gitlab-users --create-from example.csv
+gitlab-users export-users users.csv
 ```
 
-where `example.csv` contains
+Create users from a CSV file (see example format below):
+```sh
+gitlab-users create-from-csv users.csv
+```
 
-```csv
+Delete users from a CSV/text file (usernames in first column):
+```sh
+gitlab-users delete-from-csv users.csv
+```
+
+Delete a single user (asks for confirmation):
+```sh
+gitlab-users delete-user USERNAME
+```
+
+Export SSH keys of all users:
+```sh
+gitlab-users export-ssh-keys --out-dir ssh_keys
+```
+
+### Example CSV format
+
+```text
 # username, name, email, [organization], [location], [group], [access_level]
-wayne,Bruce Wayne,bruce.wayne@wayne-entreprises.com,Wayne Entreprises,Gotham City,Board,owner
-kent,Clark Kent,clark.kent@krypton.univ,,Smallville
+# Note: The fields in square brackets are optional and can be omitted if not needed.
+ww,Diana Prince,wonder.woman@themyscira.org,,Themyscira
+wayne,Bruce Wayne,bruce.wayne@wayne-enterprises.com,Wayne Enterprises,Gotham City,board,owner
 ```
 
-* List unused accounts (never sign-in or last connection is older than 1 year)
+## Development
 
-```sh
-gitlab-users --unused
-```
+- See [CONTRIBUTING.md](CONTRIBUTING.md) for dev setup, linting, testing, and release instructions.
+- Run all tests: `pytest`
+- Lint and format: `ruff check .` and `black .`
+
+## Documentation
+
+- Full API and usage documentation: [Sphinx HTML docs](https://boileaum.gitlab-users.pages.gitlab-tools/docs/)
+- To build locally:
+  ```sh
+  cd docs
+  make html
+  ```
+
+## License
+
+MIT License

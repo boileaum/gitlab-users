@@ -9,9 +9,3 @@ Table of contents
 
    api
    changelog
-
-
-Indices and tables
-------------------
-* :ref:`genindex`
-* :ref:`modindex`

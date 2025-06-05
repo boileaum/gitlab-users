@@ -20,7 +20,13 @@ classifiers = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-dev = ["ruff", "black", "pytest", "build"]
+dev = [
+    "ruff",
+    "black",
+    "pytest",
+    "pytest-cov",
+    "build"
+]
 
 [project.urls]
 Homepage = "https://github.com/boileaum/gitlab-users"
@@ -36,7 +42,7 @@ include-package-data = true
 where = ["src"]
 
 [project.scripts]
-gitlab-users = "gitlab_users.gitlab_users:main"
+gitlab-users = "gitlab_users.cli:main"
 
 [tool.black]
 line-length = 88
@@ -50,4 +56,4 @@ select = ["E", "F", "W", "I"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-ra -q"
+addopts = "-ra -q --cov=src/gitlab_users --cov-report=term-missing --cov-report=xml"

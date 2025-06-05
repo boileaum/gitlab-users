@@ -1,8 +1,11 @@
 dist/
 build/
 _build/
+_autosummary
 *.egg-info
 __pycache__
 .idea/
 .vscode/
 .venv/
+.coverage
+coverage.xml
