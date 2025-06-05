@@ -1,7 +1,10 @@
 # gitlab-users
 
-[![CI](https://github.com/boileaum/gitlab-users/actions/workflows/test.yml/badge.svg)](https://github.com/boileaum/gitlab-users/actions)
+[![CI](https://github.com/boileaum/gitlab-users/actions/workflows/ci-publish.yml/badge.svg)](https://github.com/boileaum/gitlab-users/actions/workflows/ci-publish.yml)
 [![Latest Release](https://img.shields.io/github/v/release/boileaum/gitlab-users?label=release)](https://github.com/boileaum/gitlab-users/releases)
+[![Python Version](https://img.shields.io/badge/python-3.9+-blue.svg)](https://python.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Doc](https://img.shields.io/badge/doc-sphinx-blue)](https://boileaum.gitlab-users.pages.gitlab-tools/docs/)
 
 A CLI and an API to manage GitLab user accounts, based on [python-gitlab](https://github.com/python-gitlab/python-gitlab).
