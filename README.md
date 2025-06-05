@@ -5,7 +5,7 @@
 [![Python Version](https://img.shields.io/badge/python-3.9+-blue.svg)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Doc](https://img.shields.io/badge/doc-sphinx-blue)](https://boileaum.gitlab-users.pages.gitlab-tools/docs/)
+[![Doc](https://img.shields.io/badge/doc-sphinx-blue)](https://boileaum.github.io/gitlab-users/)
 
 A CLI and an API to manage GitLab user accounts, based on [python-gitlab](https://github.com/python-gitlab/python-gitlab).
 
