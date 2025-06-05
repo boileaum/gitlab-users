@@ -58,9 +58,9 @@ Delete a single user (asks for confirmation):
 gitlab-users delete-user USERNAME
 ```
 
-Export SSH keys of all users:
+Export SSH keys of a user:
 ```sh
-gitlab-users export-ssh-keys --out-dir ssh_keys
+gitlab-users export-ssh-keys USERNAME
 ```
 
 ### Example CSV format
