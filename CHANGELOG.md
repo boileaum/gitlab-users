@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 2.0.1 - 2025-06-05
+
+### Fixed
+
+- README badges
+- Sphinx documentation publication
+
 ## Version 2.0.0 - 2025-06-05
 
 ### Changed
