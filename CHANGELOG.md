@@ -1,11 +1,18 @@
 # Changelog
 
-## Version 1.0.4 - 2025-10-01
+## Version 2.0.0 - 2025-06-05
+
+### Changed
+
+- Major reorganization of the codebase to use a more clear structure
+- Split the CLI commands into separate modules
+- Some code modenization and cleanup
 
 ### Added
 
-- documentation with Sphinx
--
+- Documentation with Sphinx
+- Full test suite with pytest
+- Pre-commit hooks for linting and formatting
 
 ## Version 1.0.3 - 2025-06-02
 
