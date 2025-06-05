@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -9,12 +9,11 @@ readme = "README.md"
 authors = [
     { name = "Matthieu Boileau", email = "matthieu.boileau@math.unistra.fr" },
 ]
-license = { file = "LICENSE" }
+license = { text = "MIT" }
 requires-python = ">=3.9"
 dependencies = ["python-gitlab>=5.0.0"]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 dynamic = ["version"]
@@ -25,21 +24,27 @@ dev = [
     "black",
     "pytest",
     "pytest-cov",
-    "build"
+    "build",
+    "pre-commit"
 ]
 
 [project.urls]
 Homepage = "https://github.com/boileaum/gitlab-users"
+Repository = "https://github.com/boileaum/gitlab-users"
+Documentation = "https://gitlab-users.readthedocs.io"
+Changelog = "https://github.com/boileaum/gitlab-users/blob/main/CHANGELOG.md"
 
 [tool.setuptools.dynamic]
 version = { attr = "gitlab_users.__version__" }
 
 [tool.setuptools]
 package-dir = { "" = "src" }
-include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+# Pour inclure des fichiers supplémentaires dans sdist
+# Malheureusement, setuptools moderne ne remplace pas complètement MANIFEST.in pour les sdist
 
 [project.scripts]
 gitlab-users = "gitlab_users.cli:main"

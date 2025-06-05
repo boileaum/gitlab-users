@@ -1,4 +1,2 @@
 include *.csv
 include *.md
-include *.txt
-include LICENSE
