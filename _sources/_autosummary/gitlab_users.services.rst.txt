@@ -1,0 +1,12 @@
+﻿gitlab\_users.services
+======================
+
+.. automodule:: gitlab_users.services
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      GitLabService
+   

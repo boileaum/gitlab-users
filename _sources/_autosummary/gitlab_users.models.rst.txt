@@ -1,0 +1,13 @@
+﻿gitlab\_users.models
+====================
+
+.. automodule:: gitlab_users.models
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Group
+      User
+   

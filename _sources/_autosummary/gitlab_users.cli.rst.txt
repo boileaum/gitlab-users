@@ -1,0 +1,18 @@
+﻿gitlab\_users.cli
+=================
+
+.. automodule:: gitlab_users.cli
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      main
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      AccessLevel
+   

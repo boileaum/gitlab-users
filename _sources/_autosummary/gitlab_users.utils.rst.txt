@@ -1,0 +1,15 @@
+﻿gitlab\_users.utils
+===================
+
+.. automodule:: gitlab_users.utils
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      export_users_to_csv
+      get_user_data
+      get_usernames_from_csv
+      get_users_from_csv
+   
