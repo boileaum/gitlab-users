@@ -72,6 +72,5 @@ napoleon_use_param = True
 napoleon_attr_annotations = True
 napoleon_preprocess_types = False  # Don't process types in docstrings
 napoleon_use_ivar = True
-napoleon_custom_sections = None  # Don't create custom sections
 
 toc_object_entries_show_parents = "hide"
