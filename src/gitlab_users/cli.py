@@ -183,8 +183,8 @@ def main():
             user = service.get_user_by_username(args.username)
             keys = service.export_ssh_keys(user)
             print(f"SSH keys for user {args.username}:")
-            for i, key in enumerate(keys, 1):
-                print(f"  {i}: {key}")
+            for key in keys:
+                print(key)
         except ValueError:
             print(f"User {args.username} not found")
     else:
